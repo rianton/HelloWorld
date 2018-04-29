@@ -11,23 +11,29 @@ from googletrans import Translator
 from humanfriendly import format_timespan, format_size, format_number, format_length
 import time, random, sys, json, codecs, threading, glob, re, string, os, requests, six, ast, pytz, urllib, urllib3, urllib.parse, traceback, atexit
 
-client = LINE()
-#client = LINE("")
-clientMid = client.profile.mid
-clientProfile = client.getProfile()
-clientSettings = client.getSettings()
-clientPoll = OEPoll(client)
+#client = LINE()
+rian = LINE("")
+rianMid = client.profile.mid
+rianProfile = rian.getProfile()
+rianSettings = rian.getSettings()
+rianPoll = OEPoll(rian)
 botStart = time.time()
 
+ki = LINE("")
+kiMid = client.profile.mid
+kiProfile = ki.getProfile()
+kiSettings = ki.getSettings()
+kiPoll = OEPoll(ki)
+botStart = time.time()
 msg_dict = {}
 
 settings = {
     "autoAdd": False,
-    "autoJoin": False,
+    "autoJoin": True,
     "autoLeave": False,
     "autoRead": False,
-    "autoRespon": False,
-    "autoJoinTicket": False,
+    "autoRespon": True,
+    "autoJoinTicket": True,
     "checkContact": False,
     "checkPost": False,
     "checkSticker": False,
@@ -229,12 +235,17 @@ try:
 except:
     print("Couldn't read Log data")
     
-settings["myProfile"]["displayName"] = clientProfile.displayName
-settings["myProfile"]["statusMessage"] = clientProfile.statusMessage
-settings["myProfile"]["pictureStatus"] = clientProfile.pictureStatus
-coverId = client.getProfileDetail()["result"]["objectId"]
+settings["myProfile"]["displayName"] = rianProfile.displayName
+settings["myProfile"]["statusMessage"] = rianProfile.statusMessage
+settings["myProfile"]["pictureStatus"] = rianProfile.pictureStatus
+coverId = rian.getProfileDetail()["result"]["objectId"]
 settings["myProfile"]["coverId"] = coverId
 
+settings["myProfile"]["displayName"] = kiProfile.displayName
+settings["myProfile"]["statusMessage"] = kiProfile.statusMessage
+settings["myProfile"]["pictureStatus"] = kiProfile.pictureStatus
+coverId = ki.getProfileDetail()["result"]["objectId"]
+settings["myProfile"]["coverId"] = coverId
 def restartBot():
     print ("[ INFO ] BOT RESTART")
     python = sys.executable
@@ -582,21 +593,21 @@ def clientBot(op):
         if op.type == 5:
             print ("[ 5 ] NOTIFIED ADD CONTACT")
             if settings["autoAdd"] == True:
-                client.findAndAddContactsByMid(op.param1)
-            sendMention(op.param1, "Halo @!,terimakasih telah menambahkan saya sebagai teman :3")
+                rian.findAndAddContactsByMid(op.param1)
+            sendMention(op.param1, "hai kak  @!,mksih ya kk dah add :3")
 
         if op.type == 13:
             print ("[ 13 ] NOTIFIED INVITE INTO GROUP")
-            if clientMid in op.param3:
+            if rianMid in op.param3:
                 if settings["autoJoin"] == True:
-                    client.acceptGroupInvitation(op.param1)
-                sendMention(op.param1, "Halo @!, Terimakasih Telah Mengundang Saya :3")
+                    rian.acceptGroupInvitation(op.param1)
+                sendMention(op.param1, "@!, mksih kak dah mengundang aku ke grup ini :3")
 
         if op.type in [22, 24]:
             print ("[ 22 And 24 ] NOTIFIED INVITE INTO ROOM & NOTIFIED LEAVE ROOM")
             if settings["autoLeave"] == True:
                 sendMention(op.param1, "Oi asw @!,ngapain invite saya")
-                client.leaveRoom(op.param1)
+                rian.leaveRoom(op.param1)
 
         if op.type == 25:
             try:
@@ -611,7 +622,7 @@ def clientBot(op):
                     setKey = ''
                 if msg.toType == 0 or msg.toType == 1 or msg.toType == 2:
                     if msg.toType == 0:
-                        if sender != client.profile.mid:
+                        if sender != rian.profile.mid:
                             to = sender
                         else:
                             to = receiver
@@ -629,10 +640,10 @@ def clientBot(op):
                                 client.sendMessage(to, str(helpMessage))
                             elif cmd == "tts":
                                 helpTextToSpeech = helptexttospeech()
-                                client.sendMessage(to, str(helpTextToSpeech))
+                                rian.sendMessage(to, str(helpTextToSpeech))
                             elif cmd == "translate":
                                 helpTranslate = helptranslate()
-                                client.sendMessage(to, str(helpTranslate))
+                                rian.sendMessage(to, str(helpTranslate))
                             elif cmd.startswith("changekey:"):
                                 sep = text.split(" ")
                                 key = text.replace(sep[0] + " ","")
@@ -640,81 +651,82 @@ def clientBot(op):
                                     client.sendMessage(to, "Key tidak bisa menggunakan spasi")
                                 else:
                                     settings["keyCommand"] = str(key).lower()
-                                    client.sendMessage(to, "Berhasil mengubah key command menjadi [ {} ]".format(str(key).lower()))
+                                    rian.sendMessage(to, "Berhasil mengubah key command menjadi [ {} ]".format(str(key).lower()))
                             elif cmd == "speed":
                                 start = time.time()
-                                client.sendMessage(to, "Benchmarking...")
+                                rian.sendMessage(to, "Benchmarking...")
                                 elapsed_time = time.time() - start
-                                client.sendMessage(to, "[ Speed ]\nKecepatan mengirim pesan {} detik".format(str(elapsed_time)))
+                                rian.sendMessage(to, "[ Speed ]\nKecepatan mengirim pesan {} detik".format(str(elapsed_time)))
+                                ki.sendMessage(to,"lemot ya")
                             elif cmd == "runtime":
                                 timeNow = time.time()
                                 runtime = timeNow - botStart
                                 runtime = format_timespan(runtime)
-                                client.sendMessage(to, "Bot sudah berjalan selama {}".format(str(runtime)))
+                                rian.sendMessage(to, "Bot sudah berjalan selama {}".format(str(runtime)))
                             elif cmd == "restart":
-                                client.sendMessage(to, "Berhasil merestart Bot")
+                                rian.sendMessage(to, "Berhasil merestart Bot")
                                 restartBot()
 # Pembatas Script #
                             elif cmd == "autoadd on":
                                 settings["autoAdd"] = True
-                                client.sendMessage(to, "Berhasil mengaktifkan auto add")
+                                rian.sendMessage(to, "Berhasil mengaktifkan auto add")
                             elif cmd == "autoadd off":
                                 settings["autoAdd"] = False
-                                client.sendMessage(to, "Berhasil menonaktifkan auto add")
+                                rian.sendMessage(to, "Berhasil menonaktifkan auto add")
                             elif cmd == "autojoin on":
                                 settings["autoJoin"] = True
-                                client.sendMessage(to, "Berhasil mengaktifkan auto join")
+                                rian.sendMessage(to, "Berhasil mengaktifkan auto join")
                             elif cmd == "autojoin off":
                                 settings["autoJoin"] = False
-                                client.sendMessage(to, "Berhasil menonaktifkan auto join")
+                                rian.sendMessage(to, "Berhasil menonaktifkan auto join")
                             elif cmd == "autoleave on":
                                 settings["autoLeave"] = True
-                                client.sendMessage(to, "Berhasil mengaktifkan auto leave")
+                                rian.sendMessage(to, "Berhasil mengaktifkan auto leave")
                             elif cmd == "autoleave off":
                                 settings["autoLeave"] = False
-                                client.sendMessage(to, "Berhasil menonaktifkan auto leave")
+                                rian.sendMessage(to, "Berhasil menonaktifkan auto leave")
                             elif cmd == "autorespon on":
                                 settings["autoRespon"] = True
-                                client.sendMessage(to, "Berhasil mengaktifkan auto respon")
+                                rian.sendMessage(to, "Berhasil mengaktifkan auto respon")
                             elif cmd == "autorespon off":
                                 settings["autoRespon"] = False
-                                client.sendMessage(to, "Berhasil menonaktifkan auto respon")
+                                rian.sendMessage(to, "Berhasil menonaktifkan auto respon")
                             elif cmd == "autoread on":
                                 settings["autoRead"] = True
-                                client.sendMessage(to, "Berhasil mengaktifkan auto read")
+                                rian.sendMessage(to, "Berhasil mengaktifkan auto read")
                             elif cmd == "autoread off":
                                 settings["autoRead"] = False
-                                client.sendMessage(to, "Berhasil menonaktifkan auto read")
+                                rian.sendMessage(to, "Berhasil menonaktifkan auto read")
                             elif cmd == "autojointicket on":
                                 settings["autoJoinTicket"] = True
-                                client.sendMessage(to, "Berhasil mengaktifkan auto join by ticket")
+                                rian.sendMessage(to, "Berhasil mengaktifkan auto join by ticket")
                             elif cmd == "autoJoinTicket off":
                                 settings["autoJoin"] = False
-                                client.sendMessage(to, "Berhasil menonaktifkan auto join by ticket")
+                                rian.sendMessage(to, "Berhasil menonaktifkan auto join by ticket")
                             elif cmd == "checkcontact on":
                                 settings["checkContact"] = True
                                 client.sendMessage(to, "Berhasil mengaktifkan check details contact")
                             elif cmd == "checkcontact off":
                                 settings["checkContact"] = False
-                                client.sendMessage(to, "Berhasil menonaktifkan check details contact")
+                                rian.sendMessage(to, "Berhasil menonaktifkan check details contact")
                             elif cmd == "checkpost on":
                                 settings["checkPost"] = True
-                                client.sendMessage(to, "Berhasil mengaktifkan check details post")
+                                rian.sendMessage(to, "Berhasil mengaktifkan check details post")
                             elif cmd == "checkpost off":
                                 settings["checkPost"] = False
-                                client.sendMessage(to, "Berhasil menonaktifkan check details post")
+                                rian.sendMessage(to, "Berhasil menonaktifkan check details post")
                             elif cmd == "checksticker on":
                                 settings["checkSticker"] = True
-                                client.sendMessage(to, "Berhasil mengaktifkan check details sticker")
+                                rian.sendMessage(to, "Berhasil mengaktifkan check details sticker")
                             elif cmd == "checksticker off":
                                 settings["checkSticker"] = False
                                 client.sendMessage(to, "Berhasil menonaktifkan check details sticker")
                             elif cmd == "unsendchat on":
                                 settings["unsendMessage"] = True
-                                client.sendMessage(to, "Berhasil mengaktifkan unsend message")
+                                rian.sendMessage(to, "Berhasil mengaktifkan unsend message")
                             elif cmd == "unsendchat off":
                                 settings["unsendMessage"] = False
-                                client.sendMessage(to, "Berhasil menonaktifkan unsend message")
+                                rian.sendMessage(to, "Berhasil menonaktifkan unsend message")
                             elif cmd == "status":
                                 try:
                                     ret_ = "╔══[ Status ]"
@@ -741,12 +753,14 @@ def clientBot(op):
                                     if settings["unsendMessage"] == True: ret_ += "\n╠══[ ON ] Unsend Message"
                                     else: ret_ += "\n╠══[ OFF ] Unsend Message"
                                     ret_ += "\n╚══[ Status ]"
-                                    client.sendMessage(to, str(ret_))
+                                    rian.sendMessage(to, str(ret_))
+                                    ki.sedContact(to,"u67acbba40f5d7983bd60c200e92456e9")
                                 except Exception as e:
                                     client.sendMessage(msg.to, str(e))
 # Pembatas Script #
                             elif cmd == "crash":
-                                client.sendContact(to, "u1f41296217e740650e0448b96851a3e2',")
+                                ki.sendMessage(to,"nih creator paling dudul")
+                                rian.sendContact(to, "u67acbba40f5d7983bd60c200e92456e9")
                             elif cmd.startswith("changename:"):
                                 sep = text.split(" ")
                                 string = text.replace(sep[0] + " ","")
@@ -761,29 +775,29 @@ def clientBot(op):
                                 if len(string) <= 500:
                                     profile = client.getProfile()
                                     profile.statusMessage = string
-                                    client.updateProfile(profile)
-                                    client.sendMessage(to,"Berhasil mengganti status message menjadi{}".format(str(string)))
+                                    rian.updateProfile(profile)
+                                    rian.sendMessage(to,"Berhasil mengganti status message menjadi{}".format(str(string)))
                             elif cmd == "me":
                                 sendMention(to, "@!", [sender])
-                                client.sendContact(to, sender)
+                                rian.sendContact(to, sender)
                             elif cmd == "mymid":
                                 client.sendMessage(to, "[ MID ]\n{}".format(sender))
                             elif cmd == "myname":
                                 contact = client.getContact(sender)
-                                client.sendMessage(to, "[ Display Name ]\n{}".format(contact.displayName))
+                                rian.sendMessage(to, "[ Display Name ]\n{}".format(contact.displayName))
                             elif cmd == "mybio":
                                 contact = client.getContact(sender)
-                                client.sendMessage(to, "[ Status Message ]\n{}".format(contact.statusMessage))
+                                rian.sendMessage(to, "[ Status Message ]\n{}".format(contact.statusMessage))
                             elif cmd == "mypicture":
                                 contact = client.getContact(sender)
-                                client.sendImageWithURL(to,"http://dl.profile.line-cdn.net/{}".format(contact.pictureStatus))
+                                rian.sendImageWithURL(to,"http://dl.profile.line-cdn.net/{}".format(contact.pictureStatus))
                             elif cmd == "myvideoprofile":
-                                contact = client.getContact(sender)
-                                client.sendVideoWithURL(to,"http://dl.profile.line-cdn.net/{}/vp".format(contact.pictureStatus))
+                                contact = rian.getContact(sender)
+                                rian.sendVideoWithURL(to,"http://dl.profile.line-cdn.net/{}/vp".format(contact.pictureStatus))
                             elif cmd == "mycover":
-                                channel = client.getProfileCoverURL(sender)          
+                                channel = rian.getProfileCoverURL(sender)          
                                 path = str(channel)
-                                client.sendImageWithURL(to, path)
+                                rian.sendImageWithURL(to, path)
                             elif cmd.startswith("cloneprofile "):
                                 if 'MENTION' in msg.contentMetadata.keys()!= None:
                                     names = re.findall(r'@(\w+)', text)
@@ -795,21 +809,21 @@ def clientBot(op):
                                             lists.append(mention["M"])
                                     for ls in lists:
                                         contact = client.getContact(ls)
-                                        client.cloneContactProfile(ls)
-                                        client.sendMessage(to, "Berhasil mengclone profile {}".format(contact.displayName))
+                                        rian.cloneContactProfile(ls)
+                                        rian.sendMessage(to, "Berhasil mengclone profile {}".format(contact.displayName))
                             elif cmd == "restoreprofile":
                                 try:
-                                    clientProfile = client.getProfile()
-                                    clientProfile.displayName = str(settings["myProfile"]["displayName"])
-                                    clientProfile.statusMessage = str(settings["myProfile"]["statusMessage"])
-                                    clientProfile.pictureStatus = str(settings["myProfile"]["pictureStatus"])
-                                    client.updateProfileAttribute(8, clientProfile.pictureStatus)
-                                    client.updateProfile(clientProfile)
+                                    rianProfile = rian.getProfile()
+                                    rianProfile.displayName = str(settings["myProfile"]["displayName"])
+                                    rianProfile.statusMessage = str(settings["myProfile"]["statusMessage"])
+                                    rianProfile.pictureStatus = str(settings["myProfile"]["pictureStatus"])
+                                    rian.updateProfileAttribute(8, rianProfile.pictureStatus)
+                                    .updateProfile(rianProfile)
                                     coverId = str(settings["myProfile"]["coverId"])
-                                    client.updateProfileCoverById(coverId)
-                                    client.sendMessage(to, "Berhasil restore profile tunggu beberapa saat sampai profile berubah")
+                                    rian.updateProfileCoverById(coverId)
+                                    rian.sendMessage(to, "Berhasil restore profile tunggu beberapa saat sampai profile berubah")
                                 except Exception as e:
-                                    client.sendMessage(to, "Gagal restore profile")
+                                    rian.sendMessage(to, "Gagal restore profile")
                                     logError(error)
                             elif cmd == "backupprofile":
                                 try:
@@ -819,9 +833,9 @@ def clientBot(op):
                                     settings["myProfile"]["pictureStatus"] = str(profile.pictureStatus)
                                     coverId = client.getProfileDetail()["result"]["objectId"]
                                     settings["myProfile"]["coverId"] = str(coverId)
-                                    client.sendMessage(to, "Berhasil backup profile")
+                                    rian.sendMessage(to, "Berhasil backup profile")
                                 except Exception as e:
-                                    client.sendMessage(to, "Gagal backup profile")
+                                    rian.sendMessage(to, "Gagal backup profile")
                                     logError(error)
                             elif cmd.startswith("stealmid "):
                                 if 'MENTION' in msg.contentMetadata.keys()!= None:
